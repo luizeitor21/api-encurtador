@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encurtador de Links | TSI</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e24; /* Fundo escuro estilo terminal */
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #2b2b36;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+        h2 { margin-top: 0; color: #4CAF50; }
+        input {
+            width: 90%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        button:hover { background-color: #45a049; }
+        #resultado { margin-top: 20px; font-size: 16px; min-height: 24px;}
+        a { color: #64B5F6; text-decoration: none; font-weight: bold; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Encurtador de Links</h2>
+        
+        <input type="url" id="urlOriginal" placeholder="Cole sua URL gigante aqui..." required>
+        <button onclick="encurtar()">Encurtar Link</button>
+        
+        <div id="resultado"></div>
+    </div>
+
+    <script>
+        async function encurtar() {
+            const url = document.getElementById('urlOriginal').value;
+            const divResultado = document.getElementById('resultado');
+
+            if (!url) {
+                divResultado.innerHTML = "<span style='color: #ff5252;'>Por favor, insira uma URL válida.</span>";
+                return;
+            }
+
+            divResultado.innerHTML = "Processando...";
+
+            try {
+                // Faz a requisição POST para a sua própria API
+                const resposta = await fetch('/api/encurtar/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url_original: url })
+                });
+
+                const dados = await resposta.json();
+
+                if (resposta.ok) {
+                    divResultado.innerHTML = `Sucesso! <br><br> <a href="${dados.url_curta}" target="_blank">${dados.url_curta}</a>`;
+                } else {
+                    divResultado.innerHTML = `<span style='color: #ff5252;'>Erro: ${dados.erro || 'Falha ao encurtar'}</span>`;
+                }
+            } catch (erro) {
+                divResultado.innerHTML = "<span style='color: #ff5252;'>Erro ao conectar com o servidor.</span>";
+            }
+        }
+    </script>
+
+</body>
+</html>
